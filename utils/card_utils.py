@@ -36,9 +36,9 @@ pfps_url = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/ma
 property_url = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/zzz/property.json"
 titles_url = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/zzz/titles.json"
 weapons_url = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/zzz/weapons.json"
-equipmentleveltemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/EquipmentLevelTemplateTb.json"
-weaponleveltemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/WeaponLevelTemplateTb.json"
-weaponstartemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/WeaponStarTemplateTb.json"
+equipmentleveltemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/equipmentleveltemplatetb.json"
+weaponleveltemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/weaponLeveltemplatetb.json"
+weaponstartemplatetb_url = "https://git.mero.moe/dimbreath/ZenlessData/raw/branch/master/FileCfg/weaponstartemplatetb.json"
 
 score_json = load_json(path=f"{json_path}/score.json")
 avatars_json = load_json(path=f"{json_path}/avatars.json")
@@ -46,9 +46,9 @@ locs = load_json(path=f"{json_path}/locs.json")
 locs = locs["zh-cn"]
 property_json = load_json(path=f"{json_path}/property.json")
 equipments_json = load_json(path=f"{json_path}/equipments.json")
-equipmentleveltemplatetb_json = load_json(path=f"{json_path}/EquipmentLevelTemplateTb.json")
-weaponleveltemplatetb_json = load_json(path=f"{json_path}/WeaponLevelTemplateTb.json")
-weaponstartemplatetb_json = load_json(path=f"{json_path}/WeaponStarTemplateTb.json")
+equipmentleveltemplatetb_json = load_json(path=f"{json_path}/equipmentleveltemplatetb.json")
+weaponleveltemplatetb_json = load_json(path=f"{json_path}/weaponLeveltemplatetb.json")
+weaponstartemplatetb_json = load_json(path=f"{json_path}/weaponstartemplatetb.json")
 prop_list = {
     "生命值": "11101",
     "攻击力": "12101",
