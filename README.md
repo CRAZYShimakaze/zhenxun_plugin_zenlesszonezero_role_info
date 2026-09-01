@@ -4,6 +4,15 @@
 
 展示橱窗中角色的面板、评分和驱动盘榜单信息
 
+## 独立安装与更新
+
+将本仓库克隆到 `zhenxun/plugins/zenlesszonezero_role_info`。插件依赖现有 [zhenxun_extensive_plugin](https://github.com/CRAZYShimakaze/zhenxun_extensive_plugin) 仓库中的 `plugin_utils`，请确保它位于同级目录 `zhenxun/plugins/plugin_utils`。
+
+```bash
+git clone https://github.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_info.git zhenxun/plugins/zenlesszonezero_role_info
+git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
+```
+
 ## 使用
 
 - 绝区零绑定uidXXXX / 绑定绝区零uidXXXX

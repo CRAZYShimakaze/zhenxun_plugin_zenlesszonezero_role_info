@@ -1,0 +1,16 @@
+# Local/generated data
+/res/bak/
+/res/json_data.zip
+/res/json_data/conver.py
+/res/other/底遮罩 - 副本*.png
+
+# Python and tooling caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db

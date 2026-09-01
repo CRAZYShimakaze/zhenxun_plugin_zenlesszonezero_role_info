@@ -51,6 +51,7 @@ from .utils.rank_utils import collect_role_rank_entries
 __plugin_meta__ = PluginMetadata(
     name="绝区零角色面板",
     description="绝区零角色面板",
+    homepage="https://github.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_info",
     usage="""
     查询橱窗内角色的面板
     指令：
@@ -779,7 +780,7 @@ def check_uid(uid):
 
 
 async def get_update_info():
-    url = "https://raw.githubusercontent.com/CRAZYShimakaze/zhenxun_extensive_plugin/main/zenlesszonezero_role_info/README.md"
+    url = "https://raw.githubusercontent.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_info/main/README.md"
     try:
         version = await client.get(url, follow_redirects=True)
         version = re.search(
@@ -795,7 +796,7 @@ async def get_update_info():
 
 
 async def _get_update_message():
-    url = "https://raw.githubusercontent.com/CRAZYShimakaze/zhenxun_extensive_plugin/main/zenlesszonezero_role_info/__init__.py"
+    url = "https://raw.githubusercontent.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_info/main/__init__.py"
     try:
         version = await client.get(url, follow_redirects=True)
         version = re.search(
