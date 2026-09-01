@@ -6,7 +6,7 @@
 
 ## 独立安装与更新
 
-将本仓库克隆到 `zhenxun/plugins/zenlesszonezero_role_info`。插件依赖现有 [zhenxun_extensive_plugin](https://github.com/CRAZYShimakaze/zhenxun_extensive_plugin) 仓库中的 `plugin_utils`，请确保它位于同级目录 `zhenxun/plugins/plugin_utils`。
+将本仓库克隆到 `zhenxun/plugins/zenlesszonezero_role_info`，使用以下命令安装或更新插件。
 
 ```bash
 git clone https://github.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_info.git zhenxun/plugins/zenlesszonezero_role_info
@@ -51,6 +51,10 @@ git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 * [Enka](https://enka.network/)的玩家数据
 
 ## 更新
+
+**2026/9/1**[v0.2.8]
+
+1. 移除金币扣费依赖并内置资源下载校验工具
 
 **2026/8/31**[v0.2.7]
 
