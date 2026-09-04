@@ -2,6 +2,7 @@ import copy
 import math
 import os.path
 import re
+from collections.abc import Mapping
 
 from PIL import Image, ImageDraw
 
@@ -42,6 +43,48 @@ special_list = load_json(f"{json_path}/special_list.json")
 pos_name = [1, 2, 3, 4, 5, 6]
 role_avatar_url = load_json(f"{json_path}/role_avatar_url.json")
 
+
+PROPERTY_DISPLAY_ORDER = (
+    "暴击率",
+    "暴击伤害",
+    "异常掌控",
+    "异常精通",
+    "贯穿力",
+    "穿透率",
+    "穿透值",
+    "冲击力",
+    "伤害加成",
+    "能量自动回复",
+)
+INTEGER_ADDITIVE_PROPERTIES = {"异常精通", "贯穿力", "穿透值"}
+INTEGER_MULTIPLIER_PROPERTIES = {"异常掌控", "冲击力"}
+PERCENTAGE_PROPERTIES = {"暴击率", "暴击伤害", "穿透率", "伤害加成"}
+
+
+def calculate_display_value(properties: Mapping[str, float], name: str) -> float:
+    base = properties.get(f"基础{name}", 0)
+    extra = properties.get(f"额外{name}", 0)
+    if name in INTEGER_MULTIPLIER_PROPERTIES:
+        return math.floor(base * (10000 + extra) / 10000)
+    if name == "能量自动回复":
+        return math.floor(base * (10000 + extra) / 10000) / 100
+
+    value = math.floor(base + extra)
+    if name not in INTEGER_ADDITIVE_PROPERTIES:
+        return value / 100
+    return value
+
+
+def select_display_properties(
+    properties: Mapping[str, float], limit: int = 6
+) -> list[tuple[str, float]]:
+    candidates = [
+        (name, calculate_display_value(properties, name))
+        for name in PROPERTY_DISPLAY_ORDER
+    ]
+    nonzero = [item for item in candidates if item[1] != 0]
+    zero = [item for item in candidates if item[1] == 0]
+    return (nonzero + zero)[:limit]
 
 
 def draw_dmg_pic(dmg: dict[str, tuple | list]):
@@ -297,47 +340,16 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
         # text_length = bg_draw.textlength(f"+{int(prop.get('额外冲击力', 0))}", font=get_font(34, "number.ttf"))
         # draw_right_text(bg_draw, f"{int(prop['基础冲击力'])}", 480 - text_length - 5, 379, "white", get_font(34, "number.ttf"))
         # draw_right_text(bg_draw, f"+{int(prop.get('额外冲击力', 0))}", 480, 379, "#59c538", get_font(34, "number.ttf"))
-        prop_list = [
-            "暴击率",
-            "暴击伤害",
-            "异常掌控",
-            "异常精通",
-            "贯穿力",
-            "穿透率",
-            "穿透值",
-            "冲击力",
-            "伤害加成",
-            "能量自动回复",
-        ]
-        effective, weight_name = get_effective(data)
-        sorted_items = sorted(effective.items(), key=lambda x: x[1], reverse=True)
-
-        # prop_list=dict(sorted_items).keys()
         y = 377  # 436
-
         b = 379  # 438
-        cnt = 0
-        for item in prop_list:
-            if prop.get(f"额外{item}", 0) == 0 and cnt >= 6:
-                continue
-            cnt += 1
-            if "能量" in item:
-                text = math.floor(prop.get(f"基础{item}", 0) * (10000 + prop.get(f"额外{item}", 0)) / 10000)
-            else:
-                text = math.floor(prop.get(f"基础{item}", 0) + prop.get(f"额外{item}", 0))
-            if item not in integer_property:
-                text = text / 100
-            if int(text) == 0:
-                continue
+        for item, text in select_display_properties(prop):
             bg_draw.text((89, y), item, fill="white", font=get_font(34, "hywh.ttf"))
-            if item not in integer_property and "能量" not in item:
+            if item in PERCENTAGE_PROPERTIES:
                 draw_right_text(bg_draw, f"{text}%", 480, b, "white", get_font(34, "number.ttf"))
             else:
                 draw_right_text(bg_draw, f"{text}", 480, b, "white", get_font(34, "number.ttf"))
             y += 58
             b += 58
-            if y >= 669:
-                break
         # text = math.floor(prop["基础暴击率"] + prop.get("额外暴击率", 0)) / 100
         # bg_draw.text((89, 436), "暴击率", fill="white", font=get_font(34, "hywh.ttf"))
         # draw_right_text(bg_draw, f"{text}%", 480, 438, "white", get_font(34, "number.ttf"))

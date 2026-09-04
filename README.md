@@ -52,6 +52,10 @@ git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 
 ## 更新
 
+**2026/9/4**[v0.2.9]
+
+1. 重构角色卡属性展示逻辑，统一属性换算并优先展示非零属性
+
 **2026/9/1**[v0.2.8]
 
 1. 移除金币扣费依赖并内置资源下载校验工具
