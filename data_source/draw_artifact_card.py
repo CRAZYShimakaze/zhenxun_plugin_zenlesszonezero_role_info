@@ -69,7 +69,7 @@ async def draw_artifact_card(title, uid, artifact_info, ace2_num, ace_num, plugi
         artifact_bg = load_image(f"{other_path}/star{artifact['星级']}.png", size=(100, 100))
         bg.alpha_composite(artifact_bg, (slice_offset_x + 200, slice_offset_y + 67))
         reli_icon = f"{reli_path}/{artifact['名称']}.png"
-        reli_icon = await get_img(url=resource_url.format(artifact["名称"]), size=(100, 100), save_path=reli_icon, mode="RGBA")
+        reli_icon = await get_img(url=resource_url.format(artifact["图标"]), size=(100, 100), save_path=reli_icon, mode="RGBA")
         bg.alpha_composite(reli_icon, (slice_offset_x + 200, slice_offset_y + 67))
         if "角色" in artifact and artifact.get("角色", ""):
             if artifact.get("角色", ""):  # in role_name.get(item)["name"]:
