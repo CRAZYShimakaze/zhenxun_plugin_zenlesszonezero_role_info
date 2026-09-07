@@ -428,7 +428,7 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
         if data["武器"]:
             weapon_bg = load_image(f"{other_path}/star{data['武器']['星级'] + 1}.png", size=(150, 150))
             bg.alpha_composite(weapon_bg, (91, 760))
-            weapon_icon = f"{weapon_path}/{data['武器']['名称']}.png"
+            weapon_icon = f"{weapon_path}/{data['武器']['图标']}.png"
             weapon_icon = await get_img(
                 url=resource_url.format("ui/zzz/" + data["武器"]["图标"] + ".png"),
                 size=(150, 150),
