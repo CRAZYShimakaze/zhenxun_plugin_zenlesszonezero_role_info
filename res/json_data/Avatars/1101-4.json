@@ -1,6 +1,6 @@
 {
     "Name": "珂蕾妲",
-    "UpgradeLevel": 0,
+    "UpgradeLevel": 4,
     "ElementTypes": [
         "Fire"
     ],
@@ -55,9 +55,12 @@
         },
         "MathSkill": {
             "Title": "额外能力：白祇管理学",
-            "Description": "队伍中存在与自身属性或阵营相同的角色或<color=#FFFFFF>[命破]</color>角色时触发：\n珂蕾妲发动<color=#FFFFFF>[强化特殊技]</color>引发爆炸命中敌人时，对目标施加减益效果；当目标陷入失衡状态后，<color=#FFFFFF>[连携技]</color>对其造成的伤害提升35%，最多叠加2层，失衡状态结束时该效果重置。"
+            "Description": "队伍中存在与自身属性或阵营相同的角色或<color=#FFFFFF>[命破]</color>或<color=#FFFFFF>[锋御]</color>角色时触发：\n珂蕾妲发动<color=#FFFFFF>[强化特殊技]</color>引发爆炸命中敌人时，对目标施加减益效果；当目标陷入失衡状态后，<color=#FFFFFF>[连携技]</color>对其造成的伤害提升35%，最多叠加2层，失衡状态结束时该效果重置。"
         },
-        "AwakenAbility": {},
+        "AwakenAbility": {
+            "Title": "潜能觉醒：爆破作业",
+            "Description": "队伍中的[锋御]代理人锐暴伤害提升<color=#2BAD00>8%</color>，非[锋御]代理人暴击伤害提升<color=#2BAD00>23%</color>。"
+        },
         "BaseProps": [
             {
                 "12201": 0,
@@ -92,9 +95,9 @@
     "Terms": {},
     "SkillDescriptions": {
         "0": {
-            "110100001": {
+            "110100002": {
                 "Title": "普通攻击：砸扁，粉碎",
-                "Description": "点按 <IconMap:Icon_Normal> 发动：\n向前方进行至多四段的打击，造成<color=#F0D12B>物理伤害</color>；\n当珂蕾妲拥有<color=#FFFFFF>[熔炉升温]</color>效果时，能够在第二段攻击后发动强化<color=#FFFFFF>[普通攻击]</color>，消耗<color=#FFFFFF>[熔炉升温]</color>效果并造成大量<color=#FF5521>火属性伤害</color>；\n当珂蕾妲与本同时出战，发动强化<color=#FFFFFF>[普通攻击]</color>时，会由双方配合发动协同攻击，进一步提升招式的威力；\n<color=#FFFFFF>[普通攻击]</color>第四段和强化<color=#FFFFFF>[普通攻击]</color>发动期间拥有无敌效果。"
+                "Description": "点按 <IconMap:Icon_Normal> 发动：\n向前方进行至多四段的打击，造成<color=#F0D12B>物理伤害</color>；\n当珂蕾妲拥有<color=#FFFFFF>[熔炉升温]</color>效果时，能够在第二段攻击后发动强化<color=#FFFFFF>[普通攻击]</color>，消耗<color=#FFFFFF>[熔炉升温]</color>效果并造成大量<color=#FF5521>火属性伤害</color>；\n强化<color=#FFFFFF>[普通攻击]</color>分为两段，发动第一段后点按或长按 <IconMap:Icon_Normal> 可衔接第二段，且第一段强化<color=#FFFFFF>[普通攻击]</color>的追击效果增强；\n<color=#FFFFFF>[熔炉升温]</color>效果最多可拥有2层，发动强化<color=#FFFFFF>[普通攻击]</color>会消耗所有的<color=#FFFFFF>[熔炉升温]</color>；\n消耗<color=#FFFFFF>[熔炉升温]</color>时，全队代理人造成的伤害提升35%，持续40秒，重复触发刷新时间，且每消耗一层<color=#FFFFFF>[熔炉升温]</color>，第二段强化<color=#FFFFFF>[普通攻击]</color>造成的伤害提升10%，造成的失衡值提升20%；\n第一段强化<color=#FFFFFF>[普通攻击]</color>发动期间切换代理人，珂蕾妲会在前台自动发动第二段强化<color=#FFFFFF>[普通攻击]</color>；\n当珂蕾妲与本同时出战，发动强化<color=#FFFFFF>[普通攻击]</color>，且未在第一段强化<color=#FFFFFF>[普通攻击]</color>期间切换代理人时，会由双方配合发动协同攻击，进一步提升招式的威力；\n<color=#FFFFFF>[普通攻击]</color>第四段和强化<color=#FFFFFF>[普通攻击]</color>发动期间拥有无敌效果；\n第二段强化<color=#FFFFFF>[普通攻击]</color>无敌效果持续时间增加。"
             },
             "110100021": {
                 "Title": "普通攻击：砸扁，粉碎"
@@ -157,13 +160,13 @@
             }
         },
         "1": {
-            "110100003": {
+            "110100004": {
                 "Title": "特殊技：爆破！铁锤时间",
-                "Description": "点按 <IconMap:Icon_Special> 发动：\n对前方进行打击并引发爆炸，造成<color=#FF5521>火属性伤害</color>；\n若衔接在<color=#FFFFFF>[普通攻击]</color>第二、第四段或强化<color=#FFFFFF>[普通攻击]</color>后，则能够快速发动招式，直接引发爆炸；\n当珂蕾妲与本同时出战，并衔接在强化<color=#FFFFFF>[普通攻击]</color>后快速发动招式时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间抗打断等级提升。"
+                "Description": "点按 <IconMap:Icon_Special> 发动：\n对前方进行打击并引发爆炸，造成<color=#FF5521>火属性伤害</color>；\n若衔接在<color=#FFFFFF>[普通攻击]</color>第二、第四段或强化<color=#FFFFFF>[普通攻击]</color>后，则能够快速发动招式，直接引发爆炸；\n第二段<color=#FFFFFF>[普通攻击]</color>发动期间，长按 <IconMap:Icon_Normal> 也可直接引发爆炸；\n当珂蕾妲与本同时出战，并衔接在强化<color=#FFFFFF>[普通攻击]</color>后快速发动招式时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间抗打断等级提升。"
             },
-            "110100005": {
+            "110100006": {
                 "Title": "强化特殊技：沸腾熔炉",
-                "Description": "能量足够时，点按 <IconMap:Icon_SpecialReady> 发动：\n对前方进行打击并引发强力爆炸，造成大量<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n若衔接在<color=#FFFFFF>[普通攻击]</color>第二、第四段或强化<color=#FFFFFF>[普通攻击]</color>后，则能够快速发动招式，直接引发爆炸；\n当珂蕾妲与本同时出战，并衔接在强化<color=#FFFFFF>[普通攻击]</color>后快速发动招式时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间拥有无敌效果。"
+                "Description": "能量足够时，点按 <IconMap:Icon_SpecialReady> 发动：\n对前方进行打击并引发强力爆炸，造成大量<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n若衔接在<color=#FFFFFF>[普通攻击]</color>第二、第四段或强化<color=#FFFFFF>[普通攻击]</color>后，则能够快速发动招式，直接引发爆炸，通过该方式引发爆炸造成的失衡值提升10%；\n当珂蕾妲与本同时出战，并衔接在强化<color=#FFFFFF>[普通攻击]</color>后快速发动招式时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间拥有无敌效果，长按 <IconMap:Icon_Normal> 可衔接<color=#FFFFFF>[冲刺攻击：给我颤抖]</color>。"
             },
             "110100036": {
                 "Title": "特殊技：爆破！铁锤时间"
@@ -229,13 +232,13 @@
                 "Title": "闪避：走着瞧",
                 "Description": "点按 <IconMap:Icon_Evade> 发动：\n快速的冲刺闪避；\n招式发动期间拥有无敌效果。"
             },
-            "110100008": {
+            "110100009": {
                 "Title": "冲刺攻击：给我颤抖",
-                "Description": "闪避时，点按 <IconMap:Icon_Normal> 发动：\n向前方进行打击，造成<color=#F0D12B>物理伤害</color>。"
+                "Description": "闪避时，点按 <IconMap:Icon_Normal> 发动：\n向前方进行打击，造成<color=#F0D12B>物理伤害</color>。\n招式发动期间，若持有<color=#FFFFFF>[熔炉升温]</color>，抗打断等级提升，长按 <IconMap:Icon_Normal> 可衔接强化<color=#FFFFFF>[普通攻击]</color>。"
             },
-            "110100010": {
+            "110100011": {
                 "Title": "闪避反击：别小看我",
-                "Description": "触发<color=#FFFFFF>[极限闪避]</color>后，点按 <IconMap:Icon_Normal> 发动：\n向前方敌人发动打击并引发爆炸，造成<color=#FF5521>火属性伤害</color>；\n招式发动期间拥有无敌效果。"
+                "Description": "触发<color=#FFFFFF>[极限闪避]</color>后，点按 <IconMap:Icon_Normal> 发动：\n向前方敌人发动打击并引发爆炸，造成<color=#FF5521>火属性伤害</color>；\n招式发动期间拥有无敌效果，若持有<color=#FFFFFF>[熔炉升温]</color>，长按 <IconMap:Icon_Normal> 可衔接强化<color=#FFFFFF>[普通攻击]</color>。"
             },
             "110100051": {
                 "Title": "冲刺攻击：给我颤抖"
@@ -265,9 +268,9 @@
                 "Title": "连携技：天崩-地裂",
                 "Description": "触发<color=#FFFFFF>[连携技]</color>时，选择对应角色发动：\n在前方大范围区域发动强力爆炸，造成大量<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n招式发动期间拥有无敌效果。"
             },
-            "110100013": {
+            "110100014": {
                 "Title": "终结技：锤进地心",
-                "Description": "喧响等级达到<color=#FFFFFF>[极]</color>时，点按 <IconMap:Icon_UltimateReady> 发动：\n在前方大范围区域发动强力爆炸，造成大量<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n当珂蕾妲与本同时出战时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间拥有无敌效果。"
+                "Description": "喧响等级达到<color=#FFFFFF>[极]</color>时，点按 <IconMap:Icon_UltimateReady> 发动：\n在前方大范围区域发动强力爆炸，造成大量<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n当珂蕾妲与本同时出战时，会由双方配合发动协同攻击，进一步提升招式的威力；\n招式发动期间拥有无敌效果，长按 <IconMap:Icon_Normal> 可衔接<color=#FFFFFF>[冲刺攻击：给我颤抖]</color>。"
             },
             "110100057": {
                 "Title": "连携技：天崩-地裂"
@@ -309,9 +312,9 @@
                 "Title": "招架支援：护身锤",
                 "Description": "前场角色即将被攻击时，点按 <IconMap:Icon_Switch> 发动：\n招架敌人的攻击，累积大量失衡值；\n具有较为优秀的招架性能，承受高强度攻击时<color=#FFFFFF>[支援点数]</color>的消耗量降低；\n招式发动期间拥有无敌效果。"
             },
-            "110100019": {
+            "110100020": {
                 "Title": "支援突击：锤钟",
-                "Description": "发动<color=#FFFFFF>[招架支援]</color>后，点按 <IconMap:Icon_Normal> 发动：\n对前方敌人发动突进打击，造成<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n招式发动期间拥有无敌效果。"
+                "Description": "发动<color=#FFFFFF>[招架支援]</color>后，点按 <IconMap:Icon_Normal> 发动：\n对前方敌人发动突进打击，造成<color=#FF5521>火属性伤害</color>，并获得<color=#FFFFFF>[熔炉升温]</color>效果；\n招式发动期间拥有无敌效果，长按 <IconMap:Icon_Normal> 可衔接<color=#FFFFFF>[冲刺攻击：给我颤抖]</color>。"
             },
             "110100065": {
                 "Title": "快速支援：让我来"

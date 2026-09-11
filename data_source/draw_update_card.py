@@ -11,6 +11,22 @@ def _get_role_avatar_url(role_name: str, role_data: dict) -> str:
     )
 
 
+ROLE_TYPE_PRIORITY = {
+    "强攻": 7,
+    "击破": 6,
+    "命破": 5,
+    "锋御": 4,
+    "异常": 3,
+    "防护": 2,
+    "支援": 1,
+}
+
+
+def _role_sort_key(role: str, player_info) -> tuple[int, int]:
+    role_data = player_info.get_roles_info(role)
+    return role_data["等级"], ROLE_TYPE_PRIORITY.get(role_data.get("特性"), 0)
+
+
 async def draw_role_pic(uid: str, role_dict: dict | list, player_info):
     """
     绘制更新图片
@@ -41,7 +57,7 @@ async def draw_role_pic(uid: str, role_dict: dict | list, player_info):
     top_line = Image.new("RGBA", ((56 + 187 * row_num - 100) * multiple, 5 * multiple), (224, 217, 207, 0))
     bg.paste(top_line, (51 * multiple, 84 * multiple))
     role = role_list[-1]
-    role_list = sorted(role_list, key=lambda x: (player_info.get_roles_info(x)["等级"], -["强攻", "击破", "命破", "异常", "防护", "支援"].index(player_info.get_roles_info(x)["特性"])), reverse=True)
+    role_list = sorted(role_list, key=lambda x: _role_sort_key(x, player_info), reverse=True)
     # 绘制角色卡片
     for index, role in enumerate(role_list):
         step = (30 * multiple, 240 * multiple)
