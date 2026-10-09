@@ -89,6 +89,123 @@ def get_artifact_suit(artifacts: list):
     return suit_4, suit_2
 
 
+def _artifact_identity(artifact):
+    """Match equipment type and stats independently of source metadata."""
+    required_fields = ("所属套装", "部位", "等级", "星级", "主属性", "词条")
+    if not isinstance(artifact, dict) or any(
+        artifact.get(key) is None for key in required_fields
+    ):
+        return None
+
+    main_property = artifact["主属性"]
+    sub_properties = artifact["词条"]
+    if not isinstance(main_property, dict) or not isinstance(sub_properties, list):
+        return None
+    if any(main_property.get(key) is None for key in ("属性名", "属性值")):
+        return None
+
+    normalized_sub_properties = []
+    for item in sub_properties:
+        if not isinstance(item, dict) or any(
+            item.get(key) is None for key in ("属性名", "属性值")
+        ):
+            return None
+        normalized_sub_properties.append((item["属性名"], item["属性值"]))
+
+    return (
+        artifact["所属套装"],
+        artifact["部位"],
+        artifact["等级"],
+        artifact["星级"],
+        main_property["属性名"],
+        main_property["属性值"],
+        tuple(sorted(normalized_sub_properties)),
+    )
+
+
+def _merge_artifact_metadata(old_artifact, new_artifact):
+    merged = dict(old_artifact)
+    merged.update(new_artifact)
+    for key in ("角色", "头像"):
+        if not new_artifact.get(key) and old_artifact.get(key):
+            merged[key] = old_artifact[key]
+
+    old_sub_properties = {}
+    for item in old_artifact.get("词条", []):
+        key = (item.get("属性名"), item.get("属性值"))
+        old_sub_properties.setdefault(key, []).append(item)
+
+    merged_sub_properties = []
+    for item in new_artifact.get("词条", []):
+        sub_property = dict(item)
+        key = (item.get("属性名"), item.get("属性值"))
+        old_items = old_sub_properties.get(key, [])
+        if sub_property.get("提升次数") is None and old_items:
+            previous = old_items.pop(0)
+            if previous.get("提升次数") is not None:
+                sub_property["提升次数"] = previous["提升次数"]
+        elif old_items:
+            old_items.pop(0)
+        merged_sub_properties.append(sub_property)
+    merged["词条"] = merged_sub_properties
+    return merged
+
+
+def _normalize_artifact_cache(artifact_cache, roles=None):
+    if not isinstance(artifact_cache, list):
+        return artifact_cache
+
+    roles = roles if isinstance(roles, dict) else {}
+    equipped_by_identity = {}
+    for role_name, role_data in roles.items():
+        if not isinstance(role_data, dict):
+            continue
+        avatar = role_data.get("头像")
+        for artifact in role_data.get("驱动盘", []) or []:
+            identity = _artifact_identity(artifact)
+            if identity is not None:
+                equipped_by_identity[identity] = (
+                    role_name,
+                    avatar or artifact.get("头像"),
+                )
+
+    normalized_cache = []
+    for position_cache in artifact_cache:
+        if not isinstance(position_cache, list):
+            normalized_cache.append(position_cache)
+            continue
+
+        normalized_position = []
+        identity_indexes = {}
+        for artifact in position_cache:
+            identity = _artifact_identity(artifact)
+            if identity is None:
+                normalized_position.append(artifact)
+                continue
+            if identity in identity_indexes:
+                index = identity_indexes[identity]
+                normalized_position[index] = _merge_artifact_metadata(
+                    normalized_position[index], artifact
+                )
+            else:
+                identity_indexes[identity] = len(normalized_position)
+                normalized_position.append(artifact)
+
+        for artifact in normalized_position:
+            identity = _artifact_identity(artifact)
+            if identity is None:
+                continue
+            if identity in equipped_by_identity:
+                owner, avatar = equipped_by_identity[identity]
+                artifact["角色"] = owner
+                if avatar:
+                    artifact["头像"] = avatar
+            elif artifact.get("角色") in roles:
+                artifact["角色"] = ""
+        normalized_cache.append(normalized_position)
+    return normalized_cache
+
+
 class PlayerInfo:
     def __init__(self, uid: [int, str]):
         self.path = f"{player_info_path}/{uid}.json"
@@ -103,6 +220,7 @@ class PlayerInfo:
             self.data["大毕业驱动盘"] = 0
         if "驱动盘列表" not in self.data:
             self.data["驱动盘列表"] = [[], [], [], [], [], []]
+        self.data["驱动盘列表"] = _normalize_artifact_cache(self.data["驱动盘列表"], self.roles)
 
     def set_player(self, data: dict):
         player_info = data["SocialDetail"]["ProfileDetail"]
@@ -279,6 +397,7 @@ class PlayerInfo:
     def save(self):
         self.data["玩家信息"] = self.player_info
         self.data["角色"] = self.roles
+        self.data["驱动盘列表"] = _normalize_artifact_cache(self.data["驱动盘列表"], self.roles)
         save_json(data=self.data, path=self.path)
 
 

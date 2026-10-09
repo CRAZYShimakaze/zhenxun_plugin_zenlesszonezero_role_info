@@ -209,7 +209,6 @@ def draw_dmg_pic(dmg: dict[str, tuple | list]):
 
 async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
     artifact_pk = player_info.data["驱动盘榜单"]
-    artifact_all = player_info.data["驱动盘列表"]
     if not only_cal:
         # bg_card = load_image(f"{bg_path}/背景_{data['元素']}.png", size=(1080, 1920), mode="RGBA")
         bg_card = load_image(f"{bg_path}/bg.png", size=(1080, 1920), mode="RGBA")
@@ -600,8 +599,6 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
             )
         if artifact_pk_info not in artifact_pk:
             artifact_pk.append(copy.deepcopy(artifact_pk_info))
-        if artifact not in artifact_all[i] and artifact["等级"] == 15:
-            artifact_all[i].append(copy.deepcopy(artifact))
 
     player_info.data["驱动盘榜单"] = sorted(player_info.data["驱动盘榜单"], key=lambda x: float(x["评分"]), reverse=True)[:20]
     data["评分"] = total_all
