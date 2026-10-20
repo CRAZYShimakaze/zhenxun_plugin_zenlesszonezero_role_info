@@ -91,7 +91,24 @@ def get_full_times(effective, artifact, pos_idx):
             if len(times) == 5:
                 break
         # print(times)
-    return sum(times) / 100
+    total = sum(times)
+    if pos_idx >= 3:
+        # 适配 Miao 的实际主词条上限修正，沿用驱动盘的权重和 55 分标尺。
+        actual_main = artifact["主属性"]["属性名"]
+        actual_main = "属性加伤" if "伤害加成" in actual_main else actual_main
+        actual_main = "能量回复" if "能量自动回复" in actual_main else actual_main
+        sub_weights = [
+            value for key, value in sorted_items
+            if key in sub_grow_max_value and key != actual_main
+        ][:4]
+        actual_max = effective.get(actual_main, 0) * 3 * (
+            0.25 + 0.05 * artifact["等级"]
+        ) + sum(
+            value * (6 if index == 0 else 1)
+            for index, value in enumerate(sub_weights)
+        )
+        total = max(total, actual_max)
+    return total / 100
 
 
 def get_artifact_score(effective, artifact, role_info, pos_idx):
@@ -110,7 +127,7 @@ def get_artifact_score(effective, artifact, role_info, pos_idx):
         main_name = "能量回复" if "能量自动回复" in main_name else main_name
         main_score = effective.get(main_name, 0) / 100 * 3 * (0.25 + 0.05 * artifact["等级"])
 
-    all_score = 55 / times * (sub_score + main_score)
+    all_score = min(55 / times * (sub_score + main_score), 70) if times > 0 else 0
 
     # 最终圣遗物评级
 
