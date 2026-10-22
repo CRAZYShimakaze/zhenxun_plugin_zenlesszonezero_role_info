@@ -1,0 +1,8 @@
+{
+    "Name": "菲欧妮",
+    "ElementTypes": ["Fire"],
+    "Specialty": {
+        "Id": 3,
+        "Name": "异常"
+    }
+}

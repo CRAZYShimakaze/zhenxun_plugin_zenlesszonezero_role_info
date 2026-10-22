@@ -7,7 +7,7 @@ from .draw_role_card import resource_url, role_avatar_url
 
 def _get_role_avatar_url(role_name: str, role_data: dict) -> str:
     return role_avatar_url.get(role_name) or resource_url.format(
-        role_data["立绘"].lstrip("/")
+        (role_data.get("头像") or role_data["立绘"]).lstrip("/")
     )
 
 

@@ -190,13 +190,23 @@ async def get_enka_info(uid, update_info, event):
         player_info = PlayerInfo(uid)
         player_info.set_player(data["PlayerInfo"])
         if role_info := data["PlayerInfo"]["ShowcaseDetail"].get("AvatarList", []):
+            skipped_roles = []
             for role in role_info:
+                role_name, _ = get_name_by_id(str(role["Id"]))
+                if not role_name:
+                    skipped_roles.append(str(role["Id"]))
+                    continue
                 try:
                     player_info.set_role(role)
-                    role_name, _ = get_name_by_id(str(role["Id"]))
                     update_role_list.append(role_name)
                 except Exception as e:
                     await get_card.send(str(e))
+            if skipped_roles:
+                await get_card.send(
+                    f"角色资料暂未收录（ID：{', '.join(skipped_roles)}），已跳过，请更新插件角色资料。"
+                )
+            if not update_role_list:
+                return await get_card.finish("本次没有可更新的角色，请检查角色资料后重试。")
             player_info.save()
         else:
             guide = load_image(f"{other_path}/collections.png")
@@ -221,7 +231,7 @@ async def check_artifact(event, player_info, roles_list, uid, group_save):
         for role_name in roles_list:
             role_data = player_info.get_roles_info(role_name)
             artifact_list = [{} for _ in range(6)]
-            if "驱动盘" not in role_data:
+            if not role_data or "驱动盘" not in role_data:
                 continue
             for j in range(len(role_data["驱动盘"])):
                 if role_data["驱动盘"][j]:

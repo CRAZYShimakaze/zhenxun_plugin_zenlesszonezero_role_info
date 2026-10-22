@@ -420,7 +420,8 @@ def dictlist_to_list(data):
     new_data = []
     for d in data:
         name, _ = get_name_by_id(str(d["Id"]))
-        new_data.append(name)
+        if name:
+            new_data.append(name)
     return new_data
 
 
