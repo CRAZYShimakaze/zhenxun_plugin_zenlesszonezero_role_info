@@ -13,7 +13,7 @@ git clone https://github.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_
 git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 ```
 
-需同步同级 `plugin_utils/panel_ranks.py`、`plugin_utils/mys_panel_sync.py`；米游社更新另需支持 `get_zzz_character_details` 的 `mys_sign` 插件。
+米游社更新需支持 `get_zzz_character_details` 的 `mys_sign` 插件。
 
 ## 使用
 
@@ -57,6 +57,10 @@ git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 * [Enka](https://enka.network/)的玩家数据
 
 ## 更新
+
+**2026/11/25**[v0.2.13]
+
+1. 群内排名与面板同步辅助逻辑移入插件，安装与更新无需额外共享模块
 
 **2026/11/25**[v0.2.12]
 

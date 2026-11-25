@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-from ..plugin_utils.mys_panel_sync import (
+from .utils.mys_panel_sync import (
     PanelSyncResult,
     get_binding,
     save_cache,

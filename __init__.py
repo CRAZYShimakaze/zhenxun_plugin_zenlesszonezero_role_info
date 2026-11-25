@@ -29,7 +29,7 @@ from zhenxun.utils.enum import PluginType
 from zhenxun.utils.exception import AllURIsFailedError
 
 # 金币扣费装饰器已停用
-from ..plugin_utils.panel_ranks import get_panel_ranks
+from .utils.panel_ranks import get_panel_ranks
 from .data_source.draw_artifact_card import draw_artifact_card
 from .data_source.draw_recommend_card import gen_artifact_recommend
 from .data_source.draw_role_rank_card import draw_role_rank_card
@@ -72,7 +72,7 @@ __plugin_meta__ = PluginMetadata(
     """.strip(),
     extra=PluginExtraData(
         author="CRAZYSHIMAKAZE",
-        version="0.2.12",
+        version="0.2.13",
         plugin_type=PluginType.NORMAL,
     ).to_dict(),
 )
