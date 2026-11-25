@@ -149,7 +149,7 @@ def get_artifact_score(effective, artifact, role_info, pos_idx):
         else "D"
     )
     calc_rank_str = (
-        "ACE*"
+        "MAX"
         if all_score >= 49.5
         else "ACE"
         if all_score >= 44
@@ -160,11 +160,11 @@ def get_artifact_score(effective, artifact, role_info, pos_idx):
         else "S"
         if all_score >= 27.5
         else "A"
-        if all_score >= 28
+        if all_score >= 22
         else "B"
-        if all_score > 22
-        else "C"
         if all_score > 16.5
+        else "C"
+        if all_score > 11.5
         else "D"
     )
     return calc_rank_str, all_score

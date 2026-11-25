@@ -29,6 +29,7 @@ from zhenxun.utils.enum import PluginType
 from zhenxun.utils.exception import AllURIsFailedError
 
 # 金币扣费装饰器已停用
+from ..plugin_utils.panel_ranks import get_panel_ranks
 from .data_source.draw_artifact_card import draw_artifact_card
 from .data_source.draw_recommend_card import gen_artifact_recommend
 from .data_source.draw_role_rank_card import draw_role_rank_card
@@ -58,9 +59,10 @@ __plugin_meta__ = PluginMetadata(
         绝区零绑定UID/uidXXX
         绝区零解绑
         XX面板 (例:星见雅面板、星见雅面板@CRAZYShimakaze、星见雅面板104442596)
+        米游社更新绝区零面板
         更新/刷新绝区零面板 (uid)
         绝区零角色排行
-        XX评分排行 (例:星见雅评分排行)
+        XX排行默认查评分 (例:星见雅排行、星见雅评分排行)
         最强XX (例:最强星见雅)
         最菜XX
         驱动盘榜单
@@ -70,7 +72,7 @@ __plugin_meta__ = PluginMetadata(
     """.strip(),
     extra=PluginExtraData(
         author="CRAZYSHIMAKAZE",
-        version="0.2.11",
+        version="0.2.12",
         plugin_type=PluginType.NORMAL,
     ).to_dict(),
 )
@@ -93,7 +95,21 @@ driver: Driver = nonebot.get_driver()
 get_card = on_regex(r"(.*)面板(.*)", priority=4, block=False)
 group_best = on_regex(r"^(最强|群最强)(.*)", priority=4)
 group_worst = on_regex(r"^(最菜|群最菜)(.*)", priority=4)
-role_rank = on_regex(r"^(.+?)评分(?:排行|榜单)$", permission=GROUP, priority=4, block=True)
+ROLE_RANK_PATTERN = re.compile(r"^(.+?)(?:评分(?:排行|榜单)|排行)$")
+
+
+async def is_role_rank(event: GroupMessageEvent) -> bool:
+    match = ROLE_RANK_PATTERN.search(str(event.get_message()))
+    return bool(match and get_role_name(match[1].strip()))
+
+
+role_rank = on_regex(
+    ROLE_RANK_PATTERN.pattern,
+    rule=is_role_rank,
+    permission=GROUP,
+    priority=4,
+    block=True,
+)
 artifact_adapt = on_regex("(.*?)([123456])适配", priority=4)
 artifact_recommend = on_regex("(.*?)([123456套])推荐", priority=4)
 artifact_list = on_command("驱动盘榜单", aliases={"驱动盘排行"}, priority=4, block=True)
@@ -107,6 +123,95 @@ check = on_command("zzzck", permission=SUPERUSER, priority=4, block=True)
 nickname_json = load_json(path=f"{json_path}/nickname.json")
 
 client = httpx.AsyncClient(timeout=120)
+
+mys_update_panel = on_command("米游社更新绝区零面板", priority=3, block=True)
+_mys_panel_users: set[int] = set()
+_mys_panel_uids: set[str] = set()
+
+
+async def _update_panel_from_mys(event: MessageEvent) -> str | Message:
+    from ..mys_sign.data_store import load_user
+    from ..mys_sign.mys_api import MysAPI
+    from .mys_sync import sync_single_zzz_uid, select_zzz_role, get_uid_binding
+
+    if event.user_id in _mys_panel_users:
+        return "你的绝区零面板正在更新中，请稍候"
+    try:
+        user = load_user(event.user_id)
+    except Exception:
+        return "读取米游社账号失败，请重新扫码登录"
+    if not user:
+        return "请先发送「扫码登录」绑定米游社账号"
+    try:
+        role = select_zzz_role(user, get_uid_binding(event.user_id))
+    except ValueError as error:
+        return str(error)
+    except Exception:
+        return "读取绝区零绑定信息失败，请稍后重试"
+    uid = str(role["game_uid"])
+    if uid in _mys_panel_uids:
+        return "该 UID 的绝区零面板正在更新中，请稍候"
+    try:
+        cache_path = Path(player_info_path) / f"{uid}.json"
+        if cache_path.exists():
+            cached = load_json(cache_path)
+            updated_at = cached.get("玩家信息", {}).get("更新时间")
+            if updated_at:
+                elapsed = (
+                    datetime.now() - datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
+                ).total_seconds()
+                if 0 <= elapsed < 60:
+                    return f"{int(60 - elapsed) + 1}秒后可再次更新!"
+    except (ValueError, TypeError, OSError, AttributeError):
+        return "读取绝区零面板缓存失败，已保留原文件"
+
+    async def notify_captcha(link: str) -> None:
+        await mys_update_panel.send(
+            MessageSegment.reply(event.message_id)
+            + "更新绝区零面板需要完成验证码，请在 3 分钟内打开链接：\n"
+            + link
+            + "\n验证完成后将自动继续更新"
+        )
+
+    _mys_panel_users.add(event.user_id)
+    _mys_panel_uids.add(uid)
+    api = None
+    try:
+        api = MysAPI()
+        result = await sync_single_zzz_uid(event.user_id, user, api, notify_captcha)
+        if result.status != "synced":
+            return f"绝区零面板更新失败：{result.error}"
+        player_info = PlayerInfo(uid)
+        roles = list(result.role_names)
+        try:
+            await check_artifact(event, player_info, roles, uid, True)
+            if any("评分" not in player_info.get_roles_info(name) for name in roles):
+                return f"绝区零角色信息已更新，共 {result.role_count} 个角色；部分驱动盘评分未能生成，请更新角色资源后重试"
+        except Exception:
+            return f"绝区零角色信息已更新，共 {result.role_count} 个角色；驱动盘评分和榜单重建失败，请稍后重试"
+        suffix = f"\n绝区零面板更新完成，共更新 {result.role_count} 个角色，已同步驱动盘及榜单"
+        if result.skipped_count:
+            suffix += f"；另有 {result.skipped_count} 个角色暂未收录，已保留其旧缓存"
+        try:
+            image = await draw_role_pic(uid, roles, player_info)
+        except Exception:
+            return suffix.strip() + "，更新图生成失败，可直接查询角色面板"
+        return image + suffix
+    except Exception:
+        return "绝区零面板更新失败，请稍后重试"
+    finally:
+        try:
+            if api is not None:
+                await api.close()
+        finally:
+            _mys_panel_users.discard(event.user_id)
+            _mys_panel_uids.discard(uid)
+
+
+@mys_update_panel.handle()
+async def _handle_mys_update_panel(event: MessageEvent):
+    result = await _update_panel_from_mys(event)
+    await mys_update_panel.finish(MessageSegment.reply(event.message_id) + result)
 
 
 @check.handle()
@@ -687,7 +792,10 @@ async def gen(event, uid, role_name, at_user=0):
     roles_list = player_info.get_roles_list()
     await check_role_avaliable(role_name, roles_list, event)
     role_data = player_info.get_roles_info(role_name)
-    img, score = await draw_role_card(uid, role_data, player_info, __plugin_version__, only_cal=False)
+    panel_ranks = await get_panel_ranks(event, player_info_path, uid, role_name, role_data)
+    img, score = await draw_role_card(
+        uid, role_data, player_info, __plugin_version__, only_cal=False, panel_ranks=panel_ranks
+    )
     msg = "" if at_user else check_role(role_name, event, img, score)
     img = image_build(img=img, quality=100, mode="RGB")
     await get_card.send(  # MessageSegment.reply(event.message_id) +
@@ -742,7 +850,7 @@ def check_role(role_name, event, img, score):
                     else:
                         return f"你仍然是本群最强{role_name}!\n"
                 else:
-                    return f"恭喜你成为本群最菜{role_name}!\n距本群最强{role_name}还有{round(float(role_info_best[0]) - score, 2)}分差距!\n"
+                    return f"恭喜你成为本群最菜{role_name}!\n"
             else:
                 if float(role_info_best[0]) <= score:
                     os.unlink(f"{role_path.parent}/{data[-1]}")
@@ -761,9 +869,9 @@ def check_role(role_name, event, img, score):
                         if old_worst != event.user_id:
                             return Message(f"恭喜你帮助{MessageSegment.at(old_worst)}摆脱最菜{role_name}的头衔!\n")
                         else:
-                            return f"你仍然是本群最菜{role_name}!\n距本群最强{role_name}还有{round(float(role_info_best[0]) - score, 2)}分差距!\n"
+                            return f"你仍然是本群最菜{role_name}!\n"
                     else:
-                        return f"距本群最强{role_name}还有{round(float(role_info_best[0]) - score, 2)}分差距!\n"
+                        return ""
     return ""
 
 

@@ -35,7 +35,7 @@ from ..utils.image_utils import (
 from .damage_cal import get_role_dmg
 from ..utils.json_utils import load_json
 
-BIG_GRADUATION_RANKS = {"ACE", "ACE*"}
+BIG_GRADUATION_RANKS = {"ACE", "MAX"}
 
 resource_url = "https://enka.network/{}"
 skill_list = load_json(f"{json_path}/skill_list.json")
@@ -55,6 +55,7 @@ PROPERTY_DISPLAY_ORDER = (
     "冲击力",
     "伤害加成",
     "能量自动回复",
+    "锐能自动累积",
 )
 INTEGER_ADDITIVE_PROPERTIES = {"异常精通", "贯穿力", "穿透值"}
 INTEGER_MULTIPLIER_PROPERTIES = {"异常掌控", "冲击力"}
@@ -66,7 +67,7 @@ def calculate_display_value(properties: Mapping[str, float], name: str) -> float
     extra = properties.get(f"额外{name}", 0)
     if name in INTEGER_MULTIPLIER_PROPERTIES:
         return math.floor(base * (10000 + extra) / 10000)
-    if name == "能量自动回复":
+    if name in {"能量自动回复", "锐能自动累积"}:
         return math.floor(base * (10000 + extra) / 10000) / 100
 
     value = math.floor(base + extra)
@@ -207,7 +208,7 @@ def draw_dmg_pic(dmg: dict[str, tuple | list]):
     return bg
 
 
-async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
+async def draw_role_card(uid, data, player_info, plugin_version, only_cal, *, panel_ranks=None):
     artifact_pk = player_info.data["驱动盘榜单"]
     if not only_cal:
         # bg_card = load_image(f"{bg_path}/背景_{data['元素']}.png", size=(1080, 1920), mode="RGBA")
@@ -218,17 +219,22 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
         except Exception as e:
             print(f"dmg error {e}")
             dmg_img = None
-        if dmg_img:
-            dmg_img = draw_dmg_pic(dmg_img)
-            bg = Image.new("RGBA", (1080, 1920 + dmg_img.size[1] + 20), (0, 0, 0, 0))
-            bg_card_center = bg_card.crop((0, 730, 1080, 1377)).resize((1080, dmg_img.size[1] + 667))
+        damage = draw_dmg_pic(dmg_img) if dmg_img else None
+        damage_height = damage.height + 20 if damage else 0
+        rank_height = panel_ranks.height + 20 if panel_ranks else 0
+        extra_height = damage_height + rank_height
+        if extra_height:
+            bg = Image.new("RGBA", (1080, 1920 + extra_height), (0, 0, 0, 0))
             bg.alpha_composite(bg_card.crop((0, 0, 1080, 730)), (0, 0))
-            bg.alpha_composite(bg_card_center, (0, 730))
-            bg.alpha_composite(bg_card.crop((0, 1377, 1080, 1920)), (0, dmg_img.size[1] + 1397))
-            bg.alpha_composite(dmg_img, (71, 1846))
+            bg.alpha_composite(
+                bg_card.crop((0, 730, 1080, 1377)).resize((1080, 647 + extra_height)),
+                (0, 730),
+            )
+            bg.alpha_composite(bg_card.crop((0, 1377, 1080, 1920)), (0, 1377 + extra_height))
+            if damage:
+                bg.alpha_composite(damage, (71, 1846))
         else:
-            bg = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))  # pyright: ignore[reportArgumentType]
-            bg.alpha_composite(bg_card, (0, 0))
+            bg = bg_card.copy()
         # 立绘
         role_pic = f"{char_pic_path}/{data['名称']}.png"
         role_pic = await get_img(url=resource_url.format(data["立绘"]), save_path=role_pic, mode="RGBA")
@@ -297,24 +303,29 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
             get_font(34, "number.ttf"),
         )
 
-        bg_draw.text((89, 259), "攻击力", fill="white", font=get_font(34, "hywh.ttf"))
-        text_length = bg_draw.textlength(f"+{int(prop.get('额外攻击力', 0))}", font=get_font(34, "number.ttf"))
-        draw_right_text(
-            bg_draw,
-            f"{int(prop['基础攻击力'])}",
-            480 - text_length - 5,
-            261,
-            "white",
-            get_font(34, "number.ttf"),
-        )
-        draw_right_text(
-            bg_draw,
-            f"+{int(prop.get('额外攻击力', 0))}",
-            480,
-            261,
-            "#59c538",
-            get_font(34, "number.ttf"),
-        )
+        if data["名称"] == "克拉蕾":
+            bg_draw.text((89, 259), "锐暴伤害", fill="white", font=get_font(34, "hywh.ttf"))
+            sharp_damage = calculate_display_value(prop, "锐暴伤害")
+            draw_right_text(bg_draw, f"{sharp_damage}%", 480, 261, "white", get_font(34, "number.ttf"))
+        else:
+            bg_draw.text((89, 259), "攻击力", fill="white", font=get_font(34, "hywh.ttf"))
+            text_length = bg_draw.textlength(f"+{int(prop.get('额外攻击力', 0))}", font=get_font(34, "number.ttf"))
+            draw_right_text(
+                bg_draw,
+                f"{int(prop['基础攻击力'])}",
+                480 - text_length - 5,
+                261,
+                "white",
+                get_font(34, "number.ttf"),
+            )
+            draw_right_text(
+                bg_draw,
+                f"+{int(prop.get('额外攻击力', 0))}",
+                480,
+                261,
+                "#59c538",
+                get_font(34, "number.ttf"),
+            )
 
         bg_draw.text((89, 317), "防御力", fill="white", font=get_font(34, "hywh.ttf"))
         text_length = bg_draw.textlength(f"+{int(prop.get('额外防御力', 0))}", font=get_font(34, "number.ttf"))
@@ -605,6 +616,11 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
     if total_cnt != 6:
         no_list = "*"
     if not only_cal:
+        if panel_ranks:
+            bg.alpha_composite(
+                panel_ranks.render(total_all, "驱动盘评分", other_path, get_font),
+                (71, 1846 + damage_height),
+            )
         # 驱动盘评分
         if total_cnt and total_all <= 55 * total_cnt:
             # score_ave = total_all / total_cnt
@@ -632,7 +648,7 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
                 else "D"
             )
             total_rank = (
-                "ACE*"
+                "MAX"
                 if total_all >= 297
                 else "ACE"
                 if total_all >= 264
@@ -662,26 +678,34 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
             font=get_font(50),
         )
 
-        rank_icon = load_image(f"{other_path}/评分{total_rank[0]}.png", mode="RGBA")
         x_offset = 204 + 440 - 20
         y_offset = -193 - 110 + 3 + 3 - 33
         score_x_offset = 204 + 440
         score_y_offset = -193 - 110 + 3 - 33
 
-        if total_rank in ["ACE", "ACE*"]:
-            rank_icon = load_image(f"{other_path}/ACE-A.png", mode="RGBA", size=(55, 73))
-            bg.alpha_composite(rank_icon, (95 + x_offset, 967 + y_offset))
-            rank_icon = load_image(f"{other_path}/ACE-C.png", mode="RGBA", size=(55, 73))
-            bg.alpha_composite(rank_icon, (145 + x_offset, 967 + y_offset))
-            rank_icon = load_image(f"{other_path}/ACE-E.png", mode="RGBA", size=(55, 73))
-            bg.alpha_composite(rank_icon, (195 + x_offset, 967 + y_offset))
+        if total_rank in ["ACE", "MAX"]:
+            rank_font = get_font(76, "number.ttf")
+            rank_color = "#e85656" if total_rank == "MAX" else "#c05250"
+            rank_stroke = 1 if total_rank == "MAX" else 0
+            rank_bounds = bg_draw.textbbox((0, 0), total_rank, font=rank_font, stroke_width=rank_stroke)
+            rank_width = rank_bounds[2] - rank_bounds[0]
+            score_x = max(250 + score_x_offset, 95 + x_offset + rank_width + 10)
             bg_draw.text(
-                (250 + score_x_offset, 974 + score_y_offset),
+                (95 + x_offset - rank_bounds[0], 967 + y_offset - rank_bounds[1]),
+                total_rank,
+                fill=rank_color,
+                font=rank_font,
+                stroke_width=rank_stroke,
+                stroke_fill=rank_color,
+            )
+            bg_draw.text(
+                (score_x, 985 + score_y_offset),
                 str(total_int),
                 fill="white",
-                font=get_font(60, "number.ttf"),
+                font=get_font(48, "number.ttf"),
             )
         elif len(total_rank) == 3:
+            rank_icon = load_image(f"{other_path}/评分{total_rank[0]}.png", mode="RGBA")
             bg.alpha_composite(rank_icon, (95 + x_offset, 967 + y_offset))
             bg.alpha_composite(rank_icon, (145 + x_offset, 967 + y_offset))
             bg.alpha_composite(rank_icon, (195 + x_offset, 967 + y_offset))
@@ -692,6 +716,7 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
                 font=get_font(60, "number.ttf"),
             )
         elif len(total_rank) == 2:
+            rank_icon = load_image(f"{other_path}/评分{total_rank[0]}.png", mode="RGBA")
             bg.alpha_composite(rank_icon, (125 + x_offset - 11, 967 + y_offset))
             bg.alpha_composite(rank_icon, (175 + x_offset - 11, 967 + y_offset))
             bg_draw.text(
@@ -701,6 +726,7 @@ async def draw_role_card(uid, data, player_info, plugin_version, only_cal):
                 font=get_font(60, "number.ttf"),
             )
         else:
+            rank_icon = load_image(f"{other_path}/评分{total_rank[0]}.png", mode="RGBA")
             bg.alpha_composite(rank_icon, (143 + x_offset - 18, 967 + y_offset))
             bg_draw.text(
                 (217 + score_x_offset, 974 + score_y_offset),

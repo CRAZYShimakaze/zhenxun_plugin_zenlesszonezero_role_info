@@ -13,14 +13,18 @@ git clone https://github.com/CRAZYShimakaze/zhenxun_plugin_zenlesszonezero_role_
 git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 ```
 
+需同步同级 `plugin_utils/panel_ranks.py`、`plugin_utils/mys_panel_sync.py`；米游社更新另需支持 `get_zzz_character_details` 的 `mys_sign` 插件。
+
 ## 使用
+
+- 米游社更新绝区零面板（先扫码登录，更新账号下角色及当前装备）
 
 - 绝区零绑定uidXXXX / 绑定绝区零uidXXXX
 - 绝区零解绑
 - XX面板 (例:星见雅面板、星见雅面板@CRAZYShimakaze、星见雅面板104442596)
 - 更新/刷新绝区零面板 (末尾可附 UID；省略时使用已绑定 UID)
 - 绝区零角色排行
-- XX评分排行/榜单 (仅群聊，例:星见雅评分排行)
+- XX排行 / XX评分排行/榜单 (仅群聊，例:星见雅排行；默认查评分)
 - 最强XX/群最强XX (仅群聊，例:最强星见雅)
 - 最菜XX/群最菜XX (仅群聊)
 - 驱动盘榜单 (别名:驱动盘排行)
@@ -32,11 +36,13 @@ git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 ## 评分与排行
 
 - 更新/刷新绝区零面板时，会重建角色评分、驱动盘榜单和毕业统计缓存。
-- 驱动盘评级中，ACE 和 ACE* 都计入大毕业驱动盘，SSS 计入小毕业驱动盘。
+- 驱动盘评级中，ACE 和 MAX 都计入大毕业驱动盘，SSS 计入小毕业驱动盘。
 - `XX评分排行` 和 `XX评分榜单` 仅在群聊处理。命令实时读取群成员名片（无名片时使用昵称）、本地 QQ-UID 绑定和 UID 角色缓存中的评分，按评分降序取最多 16 人；未绑定、没有对应角色缓存或有效评分的成员会被跳过。命令不请求外部面板接口，也不持久化独立排行。
 - 最强/最菜仅在群聊处理，并按驱动盘评分评判。
 
 ## 数据与更新
+
+- 米游社更新复用扫码账号，优先使用账号内已绑定 UID；多 UID 无法确定时需先绑定。更新后重建驱动盘评分与榜单；获取失败保留旧缓存，触发验证时按提示完成验证码。
 
 - 角色面板优先读取 UID 本地缓存；首次查询或显式更新时从 Enka 获取橱窗数据。更新后会重新计算角色评分并重建驱动盘相关缓存。
 - `驱动盘导入` 命令用于查看 PC 端扫描并私聊发送 `good.json` 的操作步骤。
@@ -51,6 +57,12 @@ git -C zhenxun/plugins/zenlesszonezero_role_info pull --ff-only
 * [Enka](https://enka.network/)的玩家数据
 
 ## 更新
+
+**2026/11/25**[v0.2.12]
+
+1. 新增「米游社更新绝区零面板」，支持账号角色、装备同步及评分榜单重建
+2. 排行改为每位玩家一行，支持默认评分排行及面板内群评分排名图
+3. 最高评级改为 MAX，优化属性展示、驱动盘评分及版本检查
 
 **2026/11/16**[v0.2.11]
 
